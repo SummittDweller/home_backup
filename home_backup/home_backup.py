@@ -7,6 +7,8 @@ import logging
 import subprocess
 import ConfigParser
 import datetime
+import netrc
+
 from shutil import rmtree
 from email.mime.text import MIMEText
 #from smtplib import SMTP_SSL as SMTP       # this invokes the secure SMTP protocol (port 465, uses SSL)
@@ -43,17 +45,23 @@ class RsyncMail():
   You could use yagmail to do this. For more information regarding this topic
   read these:
 
-  http://stackoverflow.com/questions/31827094/how-to-use-encrypted-password-in-python-email
+    http://stackoverflow.com/questions/31827094/how-to-use-encrypted-password-in-python-email
+    https://github.com/kootenpv/yagmail
 
-  https://github.com/kootenpv/yagmail
   """
 
-  def load_SMTP_standards(self):
-    self.serverAdress = 'my@mail.com'
-    self.SMTPServer = 'localhost'
-    self.SMTPUser = 'user'
-    self.SMTPPassword = 'password'
-    self.SMTPPort = 25
+  if __name__ == '__main__':
+    def load_SMTP_standards(self):
+      self.serverAdress = 'summitt.dweller@gmail.com'
+      self.SMTPServer = 'smtp.gmail.com'
+      self.SMTPPort = 587
+      # Read from the .netrc file in your home directory
+      secrets = netrc.netrc()
+      auth = secrets.authenticators(self.SMTPServer)
+      if auth:
+        self.SMTPUser = auth[0]
+        self.SMTPPassword = auth[2]
+
 
   def parse_args(self):
 
@@ -63,6 +71,7 @@ class RsyncMail():
 
     parser.add_argument("SOURCE", help="Specify the directory to backup (SOURCE).")
     parser.add_argument("TARGET", help="Specify the directory where the backup should be stored (TARGET).")
+    parser.add_argument("-r", "--remove", help="Passes --remove-source-files to rsync so that SOURCE files are deleted after successful transfer.", action="store_true")
     parser.add_argument("-t", "--trash", help="Delete unnecessary files and empty the trash.", action="store_true")
     parser.add_argument("-e", "--exclude", help="Exlude the following directories from backup.", action="append")
     parser.add_argument("-l", "--logfile", help="Specify the logfile to monitor.")
@@ -71,8 +80,8 @@ class RsyncMail():
     parser.add_argument("-u", "--update", help="Keeps files in destination if they are more recent.", action="store_true")
     parser.add_argument("-d", "--debug", help="Generates a detailed rsync log.", action="store_true")
     parser.add_argument("-c", "--config", help="Loads the config from property file.")
-    parser.add_argument("--delete", help="Deletes files and folders in the backup which has been deleted in the source.", action="store_true")
-    parser.add_argument("--legacy", help="Support for some systems without the ability to change permissions", action="store_true")
+    parser.add_argument("--delete", help="Deletes files and folders in the backup which have been deleted in the source.", action="store_true")
+    parser.add_argument("--legacy", help="Support for some systems without the ability to change permissions.", action="store_true")
     parser.add_argument("--check", help="Checks the transfered files byte-by-byte with a generated checksum. This can take a while. This option verifies that a backup is fully identical with the source.", action="store_true")
     parser.add_argument("--link", help="Creates a new Backup and only saves differences to the specified main-backup. For an incremental backup use this option with the argument ->last<-. The script then looksup the last backup in the target directory.")
     parser.add_argument("--date", help="Saves the backup into a subfolder named after the actual date in format yyyy-MM-dd into the target directory.", action="store_true")
@@ -82,6 +91,7 @@ class RsyncMail():
     # Define variables
     self.source = args.SOURCE
     self.target = args.TARGET
+    self.remove = args.remove
     self.logfile = args.logfile
     self.mail = args.mail
     self.update = args.update
@@ -209,6 +219,8 @@ class RsyncMail():
       params = params + "v" if self.debug else params
       params = params + "c" if self.args.check else params
       self.rsync_params.append(params)
+      if self.remove:
+        self.rsync_params.append("--remove-source-files")
       if self.logfile:
         self.rsync_params.append("--log-file=" + self.logfile)
       if self.args.delete:
@@ -305,8 +317,8 @@ class RsyncMail():
           self.logger.error(e.cmd)
           self.logger.error("exited with returnvalue " + str(self.return_value) + " and the following output:")
           self.logger.info(e.output)
-          if self.mail:
-              self.send_mail(self.mail, self.logfile, self.return_value, e.output)
+#          if self.mail:
+#              self.send_mail(self.mail, self.logfile, self.return_value, e.output)
           exit(1)
       self.logger.info("Backup done. Rsync exited with returncode " + str(self.return_value))
       if self.mail:

@@ -4,10 +4,10 @@ setup(
     name='home_backup',
     version='1.0',
     packages=['home_backup'],
-    url='http://zufallsheld.de/2013/09/29/python-backup-script-with-rsync/',
+    url='https://github.com/SummittDweller/home_backup/',
     license='GPL 3.0',
-    author='Sebastian Gumprich',
-    author_email='sebastian.gumprich@38.de',
+    author='Mark McFate modified from Sebastian Gumprich',
+    author_email='mark@tamatoledo.net',
     description='simple python backup script',
     long_description=open('README.md').read()
 )
