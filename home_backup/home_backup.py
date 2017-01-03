@@ -24,10 +24,10 @@ class RsyncMail():
   or by handing over a standard property file with a SMTPSection and the
   following parameters:
 
-    server.mail:      Mail-Adress of the sender, e.g. my@mail.com
-    server.adress:    The hostname of the SMTP-server, e.g. localhost or smtp.mail.com
-    server.user:      The username for logging in
-    server.password:  The users password (unencrypted)
+    server.mail:      Mail address of the sender, e.g. my@mail.com
+    server.address:    The hostname of the SMTP-server, e.g. localhost or smtp.mail.com
+    server.user:      The username for logging in       # Moved to .netrc
+    server.password:  The users password (unencrypted)  # Moved to .netrc
     server.port:      The SMTP-Port
 
   The connection to the mail server will be encrypted with TLS.
@@ -52,7 +52,7 @@ class RsyncMail():
 
   if __name__ == '__main__':
     def load_SMTP_standards(self):
-      self.serverAdress = 'summitt.dweller@gmail.com'
+      self.serveraddress = 'summitt.dweller@gmail.com'
       self.SMTPServer = 'smtp.gmail.com'
       self.SMTPPort = 587
       # Read from the .netrc file in your home directory
@@ -76,7 +76,7 @@ class RsyncMail():
     parser.add_argument("-e", "--exclude", help="Exlude the following directories from backup.", action="append")
     parser.add_argument("-l", "--logfile", help="Specify the logfile to monitor.")
     parser.add_argument("-q", "--quiet", help="Do not print to stdout.", action="store_true")
-    parser.add_argument("-m", "--mail", help="eMail-Adress whereto send the rsync-log to. Use this with the --config option to provide a Properties-File with the SMTP-Server-Config.")
+    parser.add_argument("-m", "--mail", help="eMail-address whereto send the rsync-log to. Use this with the --config option to provide a Properties-File with the SMTP-Server-Config.")
     parser.add_argument("-u", "--update", help="Keeps files in destination if they are more recent.", action="store_true")
     parser.add_argument("-d", "--debug", help="Generates a detailed rsync log.", action="store_true")
     parser.add_argument("-c", "--config", help="Loads the config from property file.")
@@ -244,8 +244,8 @@ class RsyncMail():
     try:
       config = ConfigParser.RawConfigParser()
       config.read(path)
-      self.serverAdress = config.get('SMTPSection', 'server.mail')
-      self.SMTPServer = config.get('SMTPSection', 'server.adress')
+      self.serveraddress = config.get('SMTPSection', 'server.mail')
+      self.SMTPServer = config.get('SMTPSection', 'server.address')
       self.SMTPUser = config.get('SMTPSection', 'server.user')
       self.SMTPPassword = config.get('SMTPSection', 'server.password')
       self.SMTPPort = config.get('SMTPSection', 'server.port')
@@ -276,7 +276,7 @@ class RsyncMail():
         msg['Subject'] = 'The backup has completed successfully.'
       else:
         msg['Subject'] = "The backup couldn't succeed! An Error occured! ReturnCode=" + str(return_value)
-      msg['From'] = self.serverAdress
+      msg['From'] = self.serveraddress
       msg['To'] = recipient
 
       try:
@@ -285,7 +285,7 @@ class RsyncMail():
           # Starting an encrypted TLS-Session
           self.conn.starttls()
           self.conn.login(self.SMTPUser, self.SMTPPassword)
-          self.conn.sendmail(self.serverAdress, [recipient], msg.as_string())
+          self.conn.sendmail(self.serveraddress, [recipient], msg.as_string())
           self.logger.info("Successfully sent mail to %s" % recipient)
       except Exception as e:
           self.logger.error("Sending mail failed! Error: %s" % e)

@@ -1,6 +1,6 @@
 #home_backup.py
 
-This is a backup script written in Python using 'rsync'. I use it to backup files from my hom MacBook Air and iMac computers.
+This is a backup script written in Python using 'rsync'. I use it to backup files from my personal MacBook Air and iMac computers.
 It can be used for incremental and differential backup. If properly configured it will send an email and summarize the backup.
 
 For additional info see... https://www.zufallsheld.de/2013/09/29/python-backup-script-with-rsync/
