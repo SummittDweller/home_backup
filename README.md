@@ -14,7 +14,7 @@ For additional info see... https://www.zufallsheld.de/2013/09/29/python-backup-s
                      
 Note: In my case the alias _home_backup_ is defined in .bash_profile as 
     
-    home_backup = python /Users/mark/Projects/home_backup/home_backup/home_backup.py
+    home_backup = python /Users/mark/Projects/Python/home_backup/home_backup/home_backup.py
     
 
 **Positional arguments:**
