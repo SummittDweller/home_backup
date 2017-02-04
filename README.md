@@ -75,3 +75,9 @@ Note: In my case the alias _home_backup_ is defined in .bash_profile as
         
         -Sebastian Gumprich http://zufallsheld.de
         -Pascal Laub
+
+**Typical use:**
+
+To backup email from my MacBook Air after running Email Archiver Pro...  
+    
+    home_backup --remove --debug --date --mail mark@tamatoledo.net /Users/mark/Documents/_Archived_EMail_/ /Volumes/files/STORAGE/_MAIL
