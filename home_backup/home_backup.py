@@ -78,6 +78,7 @@ class RsyncMail():
     parser.add_argument("-q", "--quiet", help="Do not print to stdout.", action="store_true")
     parser.add_argument("-m", "--mail", help="eMail-address whereto send the rsync-log to. Use this with the --config option to provide a Properties-File with the SMTP-Server-Config.")
     parser.add_argument("-u", "--update", help="Keeps files in destination if they are more recent.", action="store_true")
+    parser.add_argument("-b", "--backup", help="Keeps existing files in destination even if names match.  Older files get a ~ appended to their file name.", action="store_true")
     parser.add_argument("-d", "--debug", help="Generates a detailed rsync log.", action="store_true")
     parser.add_argument("-c", "--config", help="Loads the config from property file.")
     parser.add_argument("--delete", help="Deletes files and folders in the backup which have been deleted in the source.", action="store_true")
@@ -95,6 +96,7 @@ class RsyncMail():
     self.logfile = args.logfile
     self.mail = args.mail
     self.update = args.update
+    self.backup = args.backup
     self.debug = args.debug
     self.rsync_params = ["rsync"]
     self.args = args
@@ -216,6 +218,7 @@ class RsyncMail():
         params="-ah"
       else: params="-rlth"
       params = params + "u" if self.update else params
+      params = params + "b" if self.backup else params
       params = params + "v" if self.debug else params
       params = params + "c" if self.args.check else params
       self.rsync_params.append(params)
